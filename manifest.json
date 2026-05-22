@@ -1,0 +1,8 @@
+{
+  "name": "Allowance Manager",
+  "short_name": "allowance-ma",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6366f1"
+}
