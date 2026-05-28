@@ -3,7 +3,7 @@
   "short_name": "allowance-ma",
   "start_url": "/allowance-manager/",
   "display": "standalone",
-  "background_color": "#6366f1",
+  "background_color": "#ffffff",
   "theme_color": "#7c3aed",
   "scope": "/allowance-manager/"
 }
