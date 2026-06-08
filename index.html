@@ -12,9 +12,11 @@ j=d.createElement(s),dl=l!="dataLayer"?"&l="+l:"";j.async=true;j.src=
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#16A34A" />
     <title>子供のおこづかい管理アプリ【無料】記録・管理アプリ</title>
-    <meta name="description" content="お小遣いの収支を記録してお金の使い方を学習。グラフで可視化。登録不要・完全無料でご利用いただけます。スマホ・PC対応。スマホ・PC対応。今すぐ無料でお試しください。">
+    <meta name="description" content="無料のおこづかい管理アプリ。支出グラフ・貯金目標・月別比較でお金の流れが一目瞭然。登録不要・データはブラウザに保存。スマホ・PC対応。">
     <link rel="canonical" href="https://appadaycreator.com/allowance-manager/">
-    <link rel="manifest" href="/allowance-manager/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/allowance-manager/manifest.json">
     <meta property="og:title" content="子供のおこづかい管理アプリ【無料】記録・管理アプリ">
     <meta property="og:description" content="お小遣いの収支を記録してお金の使い方を学習。グラフで可視化。登録不要・完全無料でご利用いただけます。">
     <meta property="og:url" content="https://appadaycreator.com/allowance-manager/">
@@ -44,7 +46,7 @@ j=d.createElement(s),dl=l!="dataLayer"?"&l="+l:"";j.async=true;j.src=
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"子供のおこづかい管理アプリ【無料】記録・管理アプリの使い方","step":[{"@type":"HowToStep","position":1,"name":"記録する情報を入力する","text":"記録したい内容（日付・数値・テキスト）を入力フォームに入力する"},{"@type":"HowToStep","position":2,"name":"「追加」ボタンで保存する","text":"「追加」または「記録」ボタンを押してデータをブラウザに保存する"},{"@type":"HowToStep","position":3,"name":"記録一覧で履歴を確認する","text":"記録一覧やカレンダーで過去のデータを確認する"},{"@type":"HowToStep","position":4,"name":"グラフや集計で傾向を把握する","text":"グラフや統計機能を使ってデータの推移・傾向を分析する"},{"@type":"HowToStep","position":5,"name":"継続して変化を追跡する","text":"毎日継続的に記録することで長期的な変化を可視化する"}]}</script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', 'Noto Sans JP', sans-serif; background: linear-gradient(135deg, #D1FAE5 0%, #F0FDF4 100%); min-height: 100vh; color: #333; line-height: 1.6; }
+        body { font-family: 'Inter', 'Noto Sans JP', sans-serif; background: #f8fafc; min-height: 100vh; color: #333; line-height: 1.6; }
         .site-header { background: #16A34A; color: white; padding: 32px 20px; text-align: center; }
         .site-header .emoji { font-size: 52px; margin-bottom: 8px; }
         .site-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
@@ -90,28 +92,55 @@ j=d.createElement(s),dl=l!="dataLayer"?"&l="+l:"";j.async=true;j.src=
   [id*="result"],[id*="output"],[id*="advice"],[id*="diagnosis"],[class*="result"]{display:block!important}
 }
 ins.adsbygoogle[data-ad-status="unfilled"]{display:none!important;margin:0!important;height:0!important}
+/* トースト通知 */
+#toast { position:fixed; top:16px; right:16px; background:#16A34A; color:white; padding:10px 18px; border-radius:10px; font-size:14px; font-weight:600; box-shadow:0 4px 16px rgba(0,0,0,0.15); z-index:9999; opacity:0; transform:translateY(-8px); transition:opacity .25s, transform .25s; pointer-events:none; }
+#toast.show { opacity:1; transform:translateY(0); }
+/* 貯金目標プログレス */
+.goal-bar-wrap { height:12px; background:#e5e7eb; border-radius:6px; margin:8px 0 4px; overflow:hidden; }
+.goal-bar-fill { height:100%; border-radius:6px; background:#16A34A; transition:width .5s; }
     </style>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ホーム","item":"https://appadaycreator.com/"},{"@type":"ListItem","position":2,"name":"計算機/お金","item":"https://appadaycreator.com/category/finance/"},{"@type":"ListItem","position":3,"name":"子供のおこづかい管理アプリ記録・管理アプリ","item":"https://appadaycreator.com/allowance-manager/"}]}</script>
 </head>
 <body>
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TXQGZRF9" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <div id="pwa-banner" style="display:none;background:#e0f2fe;border-bottom:2px solid #0284c7;padding:12px 16px;text-align:center;font-size:13px;color:#0c4a6e;">
+      <p style="margin:0 0 8px;font-weight:600;">📱 アプリのようにホーム画面に追加するとより便利です</p>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+        <button id="pwa-install-btn" style="background:#0284c7;color:white;border:none;padding:6px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">インストール</button>
+        <button onclick="closePWABanner()" style="background:white;color:#0284c7;border:1px solid #0284c7;padding:6px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">今後表示しない</button>
+      </div>
+    </div>
     <a href="#main-content" class="sr-only" style="position:absolute;top:8px;left:8px;background:#16A34A;color:white;padding:8px 16px;border-radius:6px;z-index:9999;text-decoration:none;font-size:14px;" tabindex="1">メインコンテンツへスキップ</a>
     <header class="site-header" role="banner">
         <div class="emoji" aria-hidden="true">🐷</div>
         <h1>子供のおこづかい管理アプリ</h1>
         <p>お小遣いの収支を記録してお金の使い方を学習。グラフで可視化。</p>
     </header>
+<div style="background:#4338ca;padding:5px 12px;text-align:right;font-size:.78rem"><a href="/blog/" style="color:#c7d2fe;text-decoration:none;font-weight:600">📖 コラム</a>&nbsp;｜&nbsp;<a href="/" style="color:#c7d2fe;text-decoration:none">ホーム</a></div>
+
     <main id="main-content" class="container" role="main" aria-label="子供のおこづかい管理アプリのメインコンテンツ">
-        <ins class="adsbygoogle" style="display:block;min-height:0;margin:12px 0" data-ad-client="ca-pub-8427583028015858" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+<nav aria-label="パンくずリスト" style="background:#f8fafc;border-bottom:1px solid #e2e8f0;padding:6px 0;">
+  <div class="container mx-auto px-4">
+    <ol style="display:flex;flex-wrap:wrap;align-items:center;gap:4px;font-size:0.8rem;color:#6b7280;list-style:none;margin:0;padding:0;">
+      <li><a href="https://appadaycreator.com/" style="color:#4b5563;text-decoration:none;" onmouseover="this.style.color='#2563eb'" onmouseout="this.style.color='#4b5563'">ホーム</a></li>
+      <li style="color:#9ca3af;">›</li>
+      <li><a href="https://appadaycreator.com/category/productivity/" style="color:#4b5563;text-decoration:none;" onmouseover="this.style.color='#2563eb'" onmouseout="this.style.color='#4b5563'">生産性・日常</a></li>
+      <li style="color:#9ca3af;">›</li>
+      <li style="color:#1f2937;">子供のおこづかい管理アプリ記録・管理アプリ</li>
+    </ol>
+  </div>
+</nav>
+        <ins class="adsbygoogle" style="display:block;min-height:90px;margin:12px 0" data-ad-client="ca-pub-8427583028015858" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <script>try{try{(adsbygoogle = window.adsbygoogle || []).push({});}catch(e){}}catch(e){}</script>
 
         <div class="card">
           <h2 style="font-size:18px;font-weight:700;margin-bottom:4px;">🐷 記録を追加</h2>
           <p style="font-size:13px;color:#888;margin-bottom:14px;">収入・支出を記録してお金の流れを把握しよう</p>
 
           <div style="display:flex;gap:8px;margin-bottom:12px;">
-            <button class="allow-type-btn active-income" id="btn-income" onclick="setType('income')">＋ 収入（もらった）</button>
-            <button class="allow-type-btn" id="btn-expense" onclick="setType('expense')">－ 支出（つかった）</button>
+            <button class="allow-type-btn active-income" id="btn-income" aria-label="収入を記録" onclick="setType('income')">＋ 収入（もらった）</button>
+            <button class="allow-type-btn" id="btn-expense" aria-label="支出を記録" onclick="setType('expense')">－ 支出（つかった）</button>
           </div>
 
           <label>日付</label>
@@ -125,27 +154,52 @@ ins.adsbygoogle[data-ad-status="unfilled"]{display:none!important;margin:0!impor
 
           <label>カテゴリ</label>
           <select id="category">
-            <option value="お手伝い">お手伝い</option>
-            <option value="定期おこづかい">定期おこづかい</option>
-            <option value="お祝い・プレゼント">お祝い・プレゼント</option>
-            <option value="おかし・ジュース">おかし・ジュース</option>
-            <option value="おもちゃ・ゲーム">おもちゃ・ゲーム</option>
-            <option value="本・まんが">本・まんが</option>
-            <option value="貯金">貯金</option>
-            <option value="その他">その他</option>
+            <option value="お手伝い">🧹 お手伝い</option>
+            <option value="定期おこづかい">💰 定期おこづかい</option>
+            <option value="お祝い・プレゼント">🎁 お祝い・プレゼント</option>
+            <option value="おかし・ジュース">🍬 おかし・ジュース</option>
+            <option value="おもちゃ・ゲーム">🎮 おもちゃ・ゲーム</option>
+            <option value="本・まんが">📚 本・まんが</option>
+            <option value="貯金">🏦 貯金</option>
+            <option value="その他">📌 その他</option>
           </select>
 
           <div style="display:flex;gap:8px;margin-top:16px;">
-            <button class="btn" id="add-btn" onclick="addEntry()" style="flex:1;">追加する</button>
-            <button class="btn" id="cancel-btn" onclick="cancelEdit()" style="flex:1;background:#999;display:none;">キャンセル</button>
+            <button class="btn" id="add-btn" aria-label="記録を追加する" onclick="addEntry()" style="flex:1;">追加する</button>
+            <button class="btn" id="cancel-btn" aria-label="編集をキャンセル" onclick="cancelEdit()" style="flex:1;background:#999;display:none;">キャンセル</button>
           </div>
         </div>
 
         <div class="result" id="result">
+          <div class="card" style="padding:12px 20px;background:#f0fdf4;border:1px solid #bbf7d0;">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <span style="font-size:13px;font-weight:600;color:#16A34A;">📅 表示期間:</span>
+              <select id="month-filter" onchange="filterByMonth()" style="width:auto;min-width:120px;min-height:36px;padding:4px 10px;font-size:13px;margin-top:0;"></select>
+              <button onclick="setTodayMonth()" style="background:#16A34A;color:white;border:none;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;min-height:36px;">今月</button>
+              <button onclick="setLastMonth()" style="background:#6b7280;color:white;border:none;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;min-height:36px;">先月</button>
+            </div>
+          </div>
+
           <div class="card" style="background:#F0FDF4;border:1px solid #BBF7D0;">
             <h3 style="font-size:14px;font-weight:700;margin-bottom:8px;color:#16A34A;">📊 サマリー</h3>
             <div id="summary"></div>
-            <button onclick="exportCSV()" style="margin-top:12px;width:100%;background:#fff;border:1.5px solid #d1d5db;color:#374151;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">⬇ CSVダウンロード</button>
+            <div id="diagnosis-msg" style="margin-top:10px;padding:8px 12px;background:#e8f5e9;border-left:3px solid #16A34A;border-radius:4px;font-size:12px;color:#2e7d32;line-height:1.6;display:none;"></div>
+            <button aria-label="CSVファイルをダウンロード" onclick="exportCSV()" style="margin-top:12px;width:100%;background:#fff;border:1.5px solid #d1d5db;color:#374151;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">⬇ CSVダウンロード</button>
+            <div id="goal-section" style="margin-top:14px;padding-top:12px;border-top:1px solid #bbf7d0;">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <span style="font-size:13px;font-weight:600;color:#16A34A;">🎯 貯金目標:</span>
+                <input type="number" id="goal-amount" min="1" placeholder="例: 3000" style="width:120px;min-height:34px;padding:4px 10px;font-size:13px;margin-top:0;" oninput="saveGoal()">
+                <span style="font-size:13px;color:#6b7280;">円</span>
+              </div>
+              <div id="goal-progress" style="display:none;margin-top:8px;">
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:#555;margin-bottom:4px;">
+                  <span id="goal-label"></span>
+                  <span id="goal-pct"></span>
+                </div>
+                <div class="goal-bar-wrap"><div class="goal-bar-fill" id="goal-bar" style="width:0%;"></div></div>
+                <p id="goal-msg" style="font-size:12px;color:#16A34A;font-weight:600;margin-top:4px;display:none;"></p>
+              </div>
+            </div>
           </div>
 
           <div class="card">
@@ -153,12 +207,13 @@ ins.adsbygoogle[data-ad-status="unfilled"]{display:none!important;margin:0!impor
             <div style="position:relative;height:250px;width:100%;"><canvas id="categoryChart"></canvas></div>
           </div>
 
+          <div class="card" id="income-category-card">
+            <h3 style="font-size:14px;font-weight:700;margin-bottom:12px;color:#16A34A;">💰 カテゴリ別収入内訳</h3>
+            <div style="position:relative;height:250px;width:100%;"><canvas id="incomeCategoryChart"></canvas></div>
+          </div>
+
           <div class="card">
             <h3 style="font-size:14px;font-weight:700;margin-bottom:12px;color:#16A34A;">📅 月別の推移</h3>
-            <label style="font-size:13px;font-weight:600;color:#555;display:block;margin-bottom:8px;">
-              表示期間:
-              <select id="month-filter" onchange="filterByMonth()"></select>
-            </label>
             <div style="position:relative;height:250px;width:100%;"><canvas id="monthChart"></canvas></div>
           </div>
         </div>
@@ -171,25 +226,29 @@ ins.adsbygoogle[data-ad-status="unfilled"]{display:none!important;margin:0!impor
               <button onclick="clearAll()" style="font-size:11px;color:#DC2626;background:none;border:1px solid #DC2626;border-radius:6px;padding:3px 8px;cursor:pointer;">全削除</button>
             </div>
           </div>
-          <div id="entries"><p style="text-align:center;color:#bbb;font-size:14px;padding:20px;">まだ記録がありません</p></div>
+          <div id="entries" style="max-height:400px;overflow-y:auto;"><p style="text-align:center;color:#bbb;font-size:14px;padding:20px;">まだ記録がありません</p></div>
         </div>
 
         <div id="edit-modal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:999;align-items:center;justify-content:center;">
           <div style="background:white;border-radius:12px;padding:24px;max-width:400px;width:90%;box-shadow:0 10px 40px rgba(0,0,0,0.2);">
-            <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">記録を編集</h3>
+            <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">記録を編集</h3>
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+              <button class="allow-type-btn" id="edit-btn-income" onclick="setEditType('income')">＋ 収入（もらった）</button>
+              <button class="allow-type-btn" id="edit-btn-expense" onclick="setEditType('expense')">－ 支出（つかった）</button>
+            </div>
             <label>日付</label><input type="date" id="edit-date">
             <label>金額（円）</label><input type="number" id="edit-amount" min="1">
             <label>内容</label><input type="text" id="edit-memo" maxlength="30">
             <label>カテゴリ</label>
             <select id="edit-category">
-              <option value="お手伝い">お手伝い</option>
-              <option value="定期おこづかい">定期おこづかい</option>
-              <option value="お祝い・プレゼント">お祝い・プレゼント</option>
-              <option value="おかし・ジュース">おかし・ジュース</option>
-              <option value="おもちゃ・ゲーム">おもちゃ・ゲーム</option>
-              <option value="本・まんが">本・まんが</option>
-              <option value="貯金">貯金</option>
-              <option value="その他">その他</option>
+              <option value="お手伝い">🧹 お手伝い</option>
+              <option value="定期おこづかい">💰 定期おこづかい</option>
+              <option value="お祝い・プレゼント">🎁 お祝い・プレゼント</option>
+              <option value="おかし・ジュース">🍬 おかし・ジュース</option>
+              <option value="おもちゃ・ゲーム">🎮 おもちゃ・ゲーム</option>
+              <option value="本・まんが">📚 本・まんが</option>
+              <option value="貯金">🏦 貯金</option>
+              <option value="その他">📌 その他</option>
             </select>
             <div style="display:flex;gap:8px;margin-top:16px;">
               <button onclick="saveEdit()" style="flex:1;background:#16A34A;color:white;border:none;padding:10px;border-radius:8px;font-weight:600;cursor:pointer;">保存</button>
@@ -207,8 +266,8 @@ ins.adsbygoogle[data-ad-status="unfilled"]{display:none!important;margin:0!impor
             </div>
         </div>
 
-        <ins class="adsbygoogle" style="display:block;min-height:0;margin:12px 0" data-ad-client="ca-pub-8427583028015858" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        <ins class="adsbygoogle" style="display:block;min-height:90px;margin:12px 0" data-ad-client="ca-pub-8427583028015858" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <script>try{try{(adsbygoogle = window.adsbygoogle || []).push({});}catch(e){}}catch(e){}</script>
 
         <div class="card" style="margin-top:8px;background:#f8fafc;">
             <h2 style="font-size:15px;font-weight:700;margin-bottom:12px;color:#374151;">📖 使い方</h2>
@@ -219,6 +278,9 @@ ins.adsbygoogle[data-ad-status="unfilled"]{display:none!important;margin:0!impor
                 <li>グラフや集計で傾向を把握する</li>
                 <li>継続的に記録して変化を追跡する</li>
             </ol>
+            <p style="margin-top:12px;padding-top:12px;border-top:1px solid #e5e7eb;font-size:12px;color:#666;">
+                💡 <strong>さらに詳しく学ぶ:</strong> <a href="https://appadaycreator.com/household-budget-analyzer/" style="color:#4f46e5;text-decoration:none;font-weight:600;">家計管理の基本を学ぶ →</a> | <a href="https://appadaycreator.com/blog/" style="color:#4f46e5;text-decoration:none;font-weight:600;">子供の金銭教育コラム →</a>
+            </p>
         </div>
 
         <div class="card" style="margin-top:8px;">
@@ -244,10 +306,18 @@ ins.adsbygoogle[data-ad-status="unfilled"]{display:none!important;margin:0!impor
               <p style="font-size:14px;font-weight:600;color:#374151;margin-bottom:4px;">Q: スマートフォンで利用できますか？</p>
               <p style="font-size:13px;color:#6b7280;line-height:1.7;">A: はい、スマートフォン・タブレット・PCすべてでご利用いただけます。</p>
             </div>
+            <div style="border-bottom:1px solid #f1f5f9;padding-bottom:12px;">
+              <p style="font-size:14px;font-weight:600;color:#374151;margin-bottom:4px;">Q: 貯金目標の設定方法は？</p>
+              <p style="font-size:13px;color:#6b7280;line-height:1.7;">A: サマリーカード内の「貯金目標」欄に金額を入力すると、貯金額の達成率がプログレスバーで表示されます。目標達成時には祝福メッセージが表示されます。</p>
+            </div>
+            <div style="padding-bottom:0;">
+              <p style="font-size:14px;font-weight:600;color:#374151;margin-bottom:4px;">Q: 子供にお金の大切さを教えるには？</p>
+              <p style="font-size:13px;color:#6b7280;line-height:1.7;">A: 毎日の記録を通じてお金の流れを見える化することが、自然な学習につながります。<a href="https://appadaycreator.com/blog/" style="color:#4f46e5;text-decoration:none;font-weight:600;">親向けのコラム記事</a>もぜひご参考ください。</p>
+            </div>
             </div>
         </div>
 
-        <div class="card" style="margin-top:8px;text-align:center;background:linear-gradient(135deg,#D1FAE5,#F0FDF4);" role="complementary" aria-label="SNSシェア">
+        <div class="card" style="margin-top:8px;text-align:center;background:#f0f9ff;" role="complementary" aria-label="SNSシェア">
             <p style="font-size:13px;font-weight:600;color:#374151;margin-bottom:10px;">📣 友人・家族にシェアする</p>
             <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
                 <a href="https://twitter.com/intent/tweet?text=%E5%AD%90%E4%BE%9B%E3%81%AE%E3%81%8A%E3%81%93%E3%81%A5%E3%81%8B%E3%81%84%E7%AE%A1%E7%90%86%E3%82%A2%E3%83%97%E3%83%AA%20%23無料ツール&url=https%3A%2F%2Fappadaycreator.com%2Fallowance-manager%2F" target="_blank" rel="noopener" aria-label="子供のおこづかい管理アプリをXでシェア" style="background:#1DA1F2;color:white;padding:8px 16px;border-radius:8px;font-size:13px;text-decoration:none;font-weight:600;min-height:44px;display:inline-flex;align-items:center;">𝕏 シェア</a>
@@ -258,7 +328,31 @@ ins.adsbygoogle[data-ad-status="unfilled"]{display:none!important;margin:0!impor
         <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px;margin:8px 0;font-size:12px;color:#92400e;">
             <strong>⚠️ 免責事項</strong>：本ツールの計算・診断結果はあくまで参考情報です。医療・法律・税務・投資等の専門的判断が必要な場合は、必ず資格を持つ専門家にご相談ください。本サービスの利用により生じた損害について、当サービスは一切の責任を負いません。
         </div>
-    </main>
+    
+<section aria-labelledby="faq-h" class="bg-white rounded-2xl shadow-md p-4 mb-4" style="max-width:740px;margin-left:auto;margin-right:auto">
+  
+<div style="background:#f0f7ff;border:1px solid #bfdbfe;border-radius:12px;padding:1.5rem 1.75rem;margin:2rem 0" id="tool-desc-box">
+  <h2 style="font-size:1.05rem;font-weight:800;color:#1e40af;margin:0 0 1rem">📋 このツールの詳細</h2>
+  <p style="color:#374151;margin:0 0 .75rem;line-height:1.8">「子供のおこづかい管理アプリ」は、日々のデータを記録・管理するための無料記録・管理ツールです。</p>
+  <p style="color:#374151;margin:0 0 .75rem;line-height:1.8">継続的に記録することで傾向やパターンが見えてきて、改善や意思決定の参考にできます。</p>
+  <p style="color:#374151;margin:0;line-height:1.8">データはブラウザに保存（ローカルストレージ）されるため、サーバーへの送信なく安心してご利用いただけます。</p>
+</div>
+<div id="tool-disclaimer" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:1.25rem 1.5rem;margin:1.5rem 0;font-size:.875rem">
+  <p style="font-weight:700;color:#374151;margin:0 0 .5rem">⚠️ 計算結果の活用にあたって</p>
+  <p style="color:#4b5563;margin:0 0 .5rem;line-height:1.75">計算結果は参考値です。入力値や前提条件によって結果が変わります。重要な判断の際は最新の公式情報をご確認ください。</p>
+  <ul style="margin:0;padding-left:1.25rem;color:#4b5563;line-height:1.9"><li><a href="https://www.caa.go.jp/" target="_blank" rel="noopener noreferrer" style="color:#4f46e5;font-size:.85rem">消費者庁「くらしの安心ガイド」</a></li></ul>
+</div>
+<h2 id="faq-h" style="font-size:1.05rem;font-weight:700;margin-bottom:12px;border-left:4px solid #4f46e5;padding-left:10px;">よくある質問</h2>
+  <dl style="line-height:1.8;">
+    <dt style="font-weight:600;margin-top:12px;">Q: 記録したデータはどこに保存されますか？</dt>
+    <dd style="margin-left:16px;color:#374151;">データはお使いのブラウザのローカルストレージに保存されます。外部サーバーへの送信は行いません。</dd>
+    <dt style="font-weight:600;margin-top:12px;">Q: 過去のデータを一覧で確認できますか？</dt>
+    <dd style="margin-left:16px;color:#374151;">はい、記録した子供のおこづかい管理アプリ記録・管理の履歴を時系列で確認できます。継続的に記録することで変化や傾向をつかめます。</dd>
+    <dt style="font-weight:600;margin-top:12px;">Q: データを削除したい場合はどうすればいいですか？</dt>
+    <dd style="margin-left:16px;color:#374151;">アプリ内の削除機能、またはブラウザのローカルストレージをクリアすることで削除できます。</dd>
+  </dl>
+</section>
+</main>
 
     <!-- アフィリエイト等 -->
     <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:14px;margin:16px auto;max-width:500px;text-align:center;">
@@ -292,27 +386,82 @@ ins.adsbygoogle[data-ad-status="unfilled"]{display:none!important;margin:0!impor
     | <a href="contact.html" style="color:white;">お問い合わせ</a></p>
     <p style="margin-top:4px;font-size:11px;opacity:0.6;">最終更新: 2026年6月 | 本サービスはアフィリエイト広告を掲載しています（A8.net/Amazon）</p>
     <p style="margin-top:6px;">© 2026 AppADayCreator. All services are free.</p>
+<div style="background:linear-gradient(135deg,#1e3a5f,#2563eb);padding:16px 12px;text-align:center;margin-top:12px;">
+  <p style="color:#e0e7ff;font-size:12px;font-weight:600;margin:0 0 4px;">運営：AppADayCreator / Tech&amp;Brace</p>
+  <p style="color:#cbd5e1;font-size:11px;margin:0 0 10px;">累計399個のWebサービスをAI駆動で開発し、現在361件以上を公開・運用しています。
+AI導入・業務自動化・Webサービス開発のご相談はこちら。</p>
+  <a href="https://tech-and-brace.com/ai-automation?utm_source=appadaycreator&utm_medium=footer&utm_campaign=b2b_cta" target="_blank" rel="noopener" onclick="if(typeof gtag==='function'){gtag('event','b2b_cta_click',{source_page:window.location.pathname,cta_position:'footer',tool_category:document.querySelector('[aria-label=\"パンくずリスト\"] li:nth-child(3) a')?document.querySelector('[aria-label=\"パンくずリスト\"] li:nth-child(3) a').innerText:'general',destination:'https://tech-and-brace.com/ai-automation'})}" style="display:inline-block;background:#fff;color:#1e3a5f;font-size:11px;font-weight:700;padding:6px 16px;border-radius:20px;text-decoration:none;">法人・B2B相談はこちら →</a>
+</div>
 </footer>
 
 <script>
 const BTN_COLOR = '#16A34A';
 const STORAGE_KEY = 'allowance-manager-entries';
+const CATEGORY_ICONS = {
+  'お手伝い': '🧹',
+  '定期おこづかい': '💰',
+  'お祝い・プレゼント': '🎁',
+  'おかし・ジュース': '🍬',
+  'おもちゃ・ゲーム': '🎮',
+  '本・まんが': '📚',
+  '貯金': '🏦',
+  'その他': '📌'
+};
+const GOAL_KEY = 'allowance-manager-goal';
 let entries = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 let currentType = 'income';
 let filteredEntries = [];
 let editingId = null;
+let editType = 'income';
 let categoryChart = null;
 let monthChart = null;
+let incomeCategoryChart = null;
+let toastTimer = null;
+let deferredPrompt = null;
 const today = new Date().toISOString().split('T')[0];
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('entry-date').value = today;
+  updateCategoryOptions('category', 'income');
   initMonthFilter();
   renderEntries();
   updateSummary();
   updateCharts();
+  if (entries.length > 0) document.getElementById('result').classList.add('show');
+  // 保存済み目標金額を復元
+  const savedGoal = localStorage.getItem(GOAL_KEY);
+  if (savedGoal) { document.getElementById('goal-amount').value = savedGoal; updateGoalProgress(); }
   document.getElementById('amount').addEventListener('keydown', e => { if (e.key === 'Enter') addEntry(); });
   document.getElementById('memo').addEventListener('keydown', e => { if (e.key === 'Enter') addEntry(); });
+  // PWA バナー表示（初回訪問時のみ）
+  showPWABannerIfNeeded();
+});
+
+function showPWABannerIfNeeded() {
+  const bannerShown = localStorage.getItem('pwa-banner-shown');
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  if (bannerShown || !isIOS) return; // iOS のみ対象
+  const banner = document.getElementById('pwa-banner');
+  banner.style.display = 'block';
+}
+
+function closePWABanner() {
+  localStorage.setItem('pwa-banner-shown', 'true');
+  document.getElementById('pwa-banner').style.display = 'none';
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+
+document.getElementById('pwa-install-btn')?.addEventListener('click', async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+  }
+  closePWABanner();
 });
 
 function initMonthFilter() {
@@ -347,7 +496,32 @@ function filterByMonth() {
     });
   }
   renderEntries();
+  updateSummary();
+  updateDiagnosis();
   updateCharts();
+}
+
+const INCOME_CATEGORIES = [
+  { value: 'お手伝い', label: '🧹 お手伝い' },
+  { value: '定期おこづかい', label: '💰 定期おこづかい' },
+  { value: 'お祝い・プレゼント', label: '🎁 お祝い・プレゼント' },
+  { value: 'その他', label: '📌 その他' },
+];
+const EXPENSE_CATEGORIES = [
+  { value: 'おかし・ジュース', label: '🍬 おかし・ジュース' },
+  { value: 'おもちゃ・ゲーム', label: '🎮 おもちゃ・ゲーム' },
+  { value: '本・まんが', label: '📚 本・まんが' },
+  { value: '貯金', label: '🏦 貯金' },
+  { value: 'その他', label: '📌 その他' },
+];
+
+function updateCategoryOptions(selectId, type) {
+  const cats = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+  const sel = document.getElementById(selectId);
+  if (!sel) return;
+  const prev = sel.value;
+  sel.innerHTML = cats.map(c => `<option value="${c.value}">${c.label}</option>`).join('');
+  if (cats.some(c => c.value === prev)) sel.value = prev;
 }
 
 function setType(type) {
@@ -361,6 +535,70 @@ function setType(type) {
     btnIncome.className = 'allow-type-btn';
     btnExpense.className = 'allow-type-btn active-expense';
   }
+  updateCategoryOptions('category', type);
+}
+
+function setEditType(type) {
+  editType = type;
+  const btnIncome = document.getElementById('edit-btn-income');
+  const btnExpense = document.getElementById('edit-btn-expense');
+  if (type === 'income') {
+    btnIncome.className = 'allow-type-btn active-income';
+    btnExpense.className = 'allow-type-btn';
+  } else {
+    btnIncome.className = 'allow-type-btn';
+    btnExpense.className = 'allow-type-btn active-expense';
+  }
+  updateCategoryOptions('edit-category', type);
+}
+
+function setTodayMonth() {
+  const currentMonth = today.substring(0, 7);
+  const select = document.getElementById('month-filter');
+  if (select) { select.value = currentMonth; filterByMonth(); }
+}
+
+function setLastMonth() {
+  const d = new Date(today + 'T00:00:00');
+  d.setMonth(d.getMonth() - 1);
+  const lastMonth = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+  const select = document.getElementById('month-filter');
+  if (select) { select.value = lastMonth; filterByMonth(); }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function saveGoal() {
+  const val = document.getElementById('goal-amount').value;
+  if (val && parseInt(val) > 0) {
+    localStorage.setItem(GOAL_KEY, val);
+  } else {
+    localStorage.removeItem(GOAL_KEY);
+  }
+  updateGoalProgress();
+}
+
+function updateGoalProgress() {
+  const goalVal = parseInt(document.getElementById('goal-amount').value) || 0;
+  const section = document.getElementById('goal-progress');
+  if (!goalVal) { section.style.display = 'none'; return; }
+  const toSum = filteredEntries.length > 0 ? filteredEntries : entries;
+  const saved = toSum.filter(e => e.category === '貯金').reduce((s, e) => s + e.amount, 0);
+  const pct = Math.min(100, Math.round((saved / goalVal) * 100));
+  document.getElementById('goal-label').textContent = `貯金額: ${saved.toLocaleString()}円 / ${goalVal.toLocaleString()}円`;
+  document.getElementById('goal-pct').textContent = `${pct}%`;
+  document.getElementById('goal-bar').style.width = pct + '%';
+  document.getElementById('goal-bar').style.background = pct >= 100 ? '#f59e0b' : '#16A34A';
+  section.style.display = 'block';
+  const msg = document.getElementById('goal-msg');
+  if (pct >= 100) { msg.textContent = '🎉 目標達成おめでとう！'; msg.style.display = 'block'; }
+  else { msg.style.display = 'none'; }
 }
 
 function addEntry() {
@@ -384,10 +622,14 @@ function addEntry() {
   document.getElementById('entry-date').value = today;
   document.getElementById('amount').value = '';
   document.getElementById('memo').value = '';
+  updateCategoryOptions('category', currentType);
   document.getElementById('result').classList.add('show');
   initMonthFilter();
   filterByMonth();
   updateSummary();
+  updateDiagnosis();
+  updateGoalProgress();
+  showToast('✅ 記録を追加しました');
 }
 
 function deleteEntry(id) {
@@ -396,6 +638,8 @@ function deleteEntry(id) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
   filterByMonth();
   updateSummary();
+  updateGoalProgress();
+  showToast('🗑 記録を削除しました');
 }
 
 function editEntry(id) {
@@ -408,6 +652,8 @@ function editEntry(id) {
   }
   document.getElementById('edit-amount').value = entry.amount;
   document.getElementById('edit-memo').value = entry.memo;
+  editType = entry.type;
+  setEditType(editType);
   document.getElementById('edit-category').value = entry.category;
   document.getElementById('edit-modal').style.display = 'flex';
 }
@@ -421,12 +667,14 @@ function saveEdit() {
   const dateObj = new Date(date + 'T00:00:00');
   const dateStr = dateObj.toLocaleDateString('ja-JP');
   const idx = entries.findIndex(e => e.id === editingId);
-  if (idx !== -1) entries[idx] = { ...entries[idx], date: dateStr, amount, memo, category };
+  if (idx !== -1) entries[idx] = { ...entries[idx], date: dateStr, amount, memo, category, type: editType };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
   cancelEdit();
   initMonthFilter();
   filterByMonth();
   updateSummary();
+  updateGoalProgress();
+  showToast('✏️ 記録を更新しました');
 }
 
 function cancelEdit() {
@@ -440,8 +688,11 @@ function clearAll() {
   if (!confirm('すべての記録を削除してよいですか？')) return;
   entries = [];
   localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  filteredEntries = [];
+  document.getElementById('result').classList.remove('show');
   filterByMonth();
   updateSummary();
+  updateGoalProgress();
 }
 
 function renderEntries() {
@@ -456,10 +707,11 @@ function renderEntries() {
     const isIncome = e.type === 'income';
     const sign = isIncome ? '+' : '-';
     const cls = isIncome ? 'entry-income' : 'entry-expense';
+    const icon = CATEGORY_ICONS[e.category] || '';
     return `<div class="entry-row">
       <div>
         <span style="font-size:12px;color:#999;">${e.date}</span>
-        <span class="category-tag">${e.category}</span>
+        <span class="category-tag">${icon} ${e.category}</span>
         <div style="margin-top:2px;font-weight:500;">${e.memo}</div>
       </div>
       <div style="display:flex;align-items:center;gap:6px;">
@@ -510,10 +762,53 @@ function updateSummary() {
       <span>記録件数</span><span>${toSum.length}件</span>
     </div>
   `;
+  updateDiagnosis();
+}
+
+function updateDiagnosis() {
+  const toSum = filteredEntries.length > 0 ? filteredEntries : entries;
+  const diagMsg = document.getElementById('diagnosis-msg');
+  if (toSum.length === 0) { diagMsg.style.display = 'none'; return; }
+
+  const totalIncome = toSum.filter(e => e.type === 'income').reduce((s, e) => s + e.amount, 0);
+  const totalExpense = toSum.filter(e => e.type === 'expense').reduce((s, e) => s + e.amount, 0);
+  const goalVal = parseInt(document.getElementById('goal-amount').value) || 0;
+  const savedAmount = toSum.filter(e => e.category === '貯金').reduce((s, e) => s + e.amount, 0);
+
+  let diagnosis = '';
+  const expenseRatio = totalIncome > 0 ? (totalExpense / totalIncome) : 0;
+  if (expenseRatio > 0.8 && totalExpense > 1000) {
+    diagnosis = '💭 今月は支出が多い月ですね。来月の貯金計画を立てるチャンスです！';
+  } else if (goalVal > 0 && savedAmount > 0) {
+    const remaining = Math.max(0, goalVal - savedAmount);
+    if (remaining <= 500 && remaining > 0) {
+      diagnosis = `🎯 貯金目標まであと ${remaining}円。もう少しで達成できます！`;
+    } else if (remaining === 0) {
+      diagnosis = '🎉 貯金目標を達成しました！次の目標に向けて頑張りましょう！';
+    }
+  }
+
+  const categoryCount = {};
+  toSum.forEach(e => {
+    if (e.type === 'expense') categoryCount[e.category] = (categoryCount[e.category] || 0) + 1;
+  });
+  const topCategory = Object.entries(categoryCount).sort((a, b) => b[1] - a[1])[0];
+  if (topCategory && topCategory[1] >= 3 && !diagnosis) {
+    const icon = CATEGORY_ICONS[topCategory[0]] || '';
+    diagnosis = `💡 ${icon}${topCategory[0]}の購入が多いですね。目標を決めて意識すると良いでしょう。`;
+  }
+
+  if (diagnosis) {
+    diagMsg.textContent = diagnosis;
+    diagMsg.style.display = 'block';
+  } else {
+    diagMsg.style.display = 'none';
+  }
 }
 
 function updateCharts() {
   updateCategoryChart();
+  updateIncomeCategoryChart();
   updateMonthChart();
 }
 
@@ -525,16 +820,45 @@ function updateCategoryChart() {
   const categories = Object.keys(categoryData);
   const amounts = Object.values(categoryData);
   const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'];
+  const labelsWithIcons = categories.map(c => (CATEGORY_ICONS[c] ? CATEGORY_ICONS[c] + ' ' : '') + c);
   const ctx = document.getElementById('categoryChart').getContext('2d');
   if (categoryChart) categoryChart.destroy();
   categoryChart = new Chart(ctx, {
     type: 'doughnut',
     data: {
-      labels: categories.length > 0 ? categories : ['データなし'],
+      labels: labelsWithIcons.length > 0 ? labelsWithIcons : ['データなし'],
       datasets: [{
         data: amounts.length > 0 ? amounts : [1],
         backgroundColor: colors.slice(0, Math.max(categories.length, 1)),
       }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { labels: { font: { size: 12 }, padding: 15 } } }
+    }
+  });
+}
+
+function updateIncomeCategoryChart() {
+  const toChart = filteredEntries.length > 0 ? filteredEntries : entries;
+  const incomes = toChart.filter(e => e.type === 'income');
+  const card = document.getElementById('income-category-card');
+  if (incomes.length === 0) { card.style.display = 'none'; if (incomeCategoryChart) { incomeCategoryChart.destroy(); incomeCategoryChart = null; } return; }
+  card.style.display = 'block';
+  const categoryData = {};
+  incomes.forEach(e => { categoryData[e.category] = (categoryData[e.category] || 0) + e.amount; });
+  const categories = Object.keys(categoryData);
+  const amounts = Object.values(categoryData);
+  const colors = ['#4ADE80', '#34D399', '#86EFAC', '#6EE7B7', '#A7F3D0', '#BBF7D0', '#D1FAE5', '#ECFDF5'];
+  const labelsWithIcons = categories.map(c => (CATEGORY_ICONS[c] ? CATEGORY_ICONS[c] + ' ' : '') + c);
+  const ctx = document.getElementById('incomeCategoryChart').getContext('2d');
+  if (incomeCategoryChart) incomeCategoryChart.destroy();
+  incomeCategoryChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labelsWithIcons,
+      datasets: [{ data: amounts, backgroundColor: colors.slice(0, categories.length) }]
     },
     options: {
       responsive: true,
@@ -595,5 +919,16 @@ function updateMonthChart() {
   });
 }
 </script>
+<div style="text-align:center;padding:10px 16px 14px;background:#eef2ff;border-top:2px solid #c7d2fe;margin-top:8px">
+<a href="/blog/" style="color:#4f46e5;font-size:.85rem;font-weight:700">📖 マネー・育児・キャリアのコラムを読む →</a>
+</div>
+<div style="background:#eef2ff;border-left:4px solid #4f46e5;border-radius:.5rem;padding:1rem 1.25rem;margin:1.5rem auto;max-width:760px;font-size:.875rem">
+<p style="margin:0 0 .5rem;font-weight:700;color:#3730a3">📖 お役立ちコラム</p>
+<ul style="margin:0;padding-left:1.25rem;color:#4f46e5;line-height:2">
+<li><a href="/blog/stock-investment-beginner/" style="color:#4f46e5">株式投資の始め方【初心者完全ガイド】</a></li>
+<li><a href="/blog/nisa-comparison/" style="color:#4f46e5">新NISA vs iDeCo 徹底比較</a></li>
+<li><a href="/blog/investment-risk-management/" style="color:#4f46e5">投資のリスク管理入門</a></li>
+</ul>
+</div>
 </body>
 </html>
