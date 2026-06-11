@@ -1,0 +1,7 @@
+target: No.190 子供のおこづかい管理アプリ
+saved_unique: 1
+expected: 3
+completed_ok: True
+stopped_detected: True
+image_paths:
+  /Users/masayukitokunaga/workspace/30service/allowance-manager/_design/2026-06-11_1510/01_design.png

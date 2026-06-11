@@ -1,0 +1,31 @@
+Fetch this design file, read its readme, and implement the relevant aspects of the design. https://api.anthropic.com/v1/design/h/KduTYzhOpCl6ZyVqpPbLSg?open_file=%E5%AD%90%E3%81%A9%E3%82%82%E3%81%AE%E3%81%8A%E3%81%93%E3%81%A5%E3%81%8B%E3%81%84%E7%AE%A1%E7%90%86%E3%82%A2%E3%83%97%E3%83%AA.html
+Implement: ## 指示
+ClaudeDesignによって作成されたデザインを効果的に反映してほしい。
+
+- LPページとサービスページのデザインを実際のWebサービスに反映する。
+- LPページは /lp/ で作成（index.htmlを新規作成）
+- サービスページは既存の / を更新。ユーザの利用動線を優先にしつつデザイン変更して。
+- コンテンツの目的に合わせて良いが、PCでもモバイルでも見れるように調整してほしい。
+- 全体のトップページのサービスページへのリンクは、LPページのURL（/lp/）に変更する
+- デプロイされた内容を実際に動作テストして問題ないことまで確認して完了とすること。
+- 今回の新デザイン（LPページのテーマカラーや素材・文字フォント・画像など）を該当既存サービスの全ページに刷新すること
+
+## Claude Design プロジェクト
+
+
+Claude Design で生成されたコンポーネント（JSX・CSS）やプロトタイプの構成・スタイルを参考に実装すること。
+
+## デザイン参照画像（ローカル）
+- LP全体デザイン:      /Users/masayukitokunaga/workspace/30service/allowance-manager/_design/2026-06-11_1510/01_design.png
+- サービスページデザイン: 
+- アイコン素材シート:   
+- 分割済みアイコン:    /Users/masayukitokunaga/workspace/30service/allowance-manager/assets/icons/split
+
+## 制約
+- GTM・GA4・AdSenseタグは変更しない
+- アフィリエイトリンクは変更しない
+- コアJSロジック（診断・計算ロジック）は変更しない
+
+## 対象プロジェクト
+190 子供のおこづかい管理アプリ allowance-manager https://appadaycreator.com/allowance-manager/
+/Users/masayukitokunaga/workspace/30service/allowance-manager/
